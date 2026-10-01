@@ -1,0 +1,12 @@
+{
+  "name": "orderly",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tiny order/refund service",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "repro": "node test/repro.js"
+  }
+}
