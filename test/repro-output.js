@@ -5,6 +5,7 @@ const { spawnSync } = require('node:child_process');
 const path = require('node:path');
 
 const repro = path.join(__dirname, 'repro.js');
+const root = path.join(__dirname, '..');
 
 function run(args) {
   const result = spawnSync(process.execPath, [repro, ...args], {
@@ -15,8 +16,23 @@ function run(args) {
   return result;
 }
 
+function runNpm(args) {
+  const result = spawnSync(
+    process.platform === 'win32' ? 'npm.cmd' : 'npm',
+    args,
+    {
+      cwd: root,
+      encoding: 'utf8',
+      shell: process.platform === 'win32'
+    }
+  );
+  assert.ifError(result.error);
+  assert.strictEqual(result.stderr, '');
+  return result;
+}
+
 const human = run([]);
-const json = run(['--json']);
+const json = runNpm(['run', '--silent', 'repro', '--', '--json']);
 const report = JSON.parse(json.stdout);
 
 const expectedResults = [
