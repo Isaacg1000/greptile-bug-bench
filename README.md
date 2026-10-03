@@ -25,9 +25,17 @@ documented here.
 ```sh
 npm start        # serves on http://localhost:3000
 npm run repro    # runs the behavioral checks
+npm run --silent repro -- --json  # emits parseable JSON without npm's banner
+npm test         # verifies repro output formats
 ```
 
 The checks are expected to fail on this revision.
+
+The JSON report contains a `results` array with each check's `name` and
+`status` (`passed` or `failed`); failed checks also include an `error` message.
+The `summary` object reports `total`, `passed`, and `failed` counts.
+The `--silent` option suppresses npm's own lifecycle banner so standard output
+contains only the JSON report.
 
 ### Sample requests
 

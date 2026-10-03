@@ -13,9 +13,13 @@ async function check(name, fn) {
   store.reset();
   try {
     await fn();
-    results.push(`PASS  ${name}`);
+    results.push({ name, status: 'passed' });
   } catch (err) {
-    results.push(`FAIL  ${name}\n      ${err.message.split('\n')[0]}`);
+    results.push({
+      name,
+      status: 'failed',
+      error: err.message.split('\n')[0]
+    });
   }
 }
 
@@ -59,9 +63,22 @@ async function main() {
     assert.strictEqual(res.status, 200);
   });
 
-  console.log(results.join('\n'));
-  const failed = results.filter((r) => r.startsWith('FAIL')).length;
-  console.log(`\n${results.length - failed} passed, ${failed} failed`);
+  const failed = results.filter((result) => result.status === 'failed').length;
+  const passed = results.length - failed;
+
+  if (process.argv.includes('--json')) {
+    console.log(JSON.stringify({
+      results,
+      summary: { total: results.length, passed, failed }
+    }, null, 2));
+  } else {
+    const lines = results.map((result) => result.status === 'passed'
+      ? `PASS  ${result.name}`
+      : `FAIL  ${result.name}\n      ${result.error}`);
+    console.log(lines.join('\n'));
+    console.log(`\n${passed} passed, ${failed} failed`);
+  }
+
   process.exitCode = failed > 0 ? 1 : 0;
 }
 
